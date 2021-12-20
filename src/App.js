@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./App.css";
 import {
   Button,
@@ -16,6 +17,8 @@ import { faAngleDoubleRight } from "@fortawesome/free-solid-svg-icons";
 import ListarMoedas from "components/List/listar-moedas";
 
 function App() {
+  const BASE_URL =
+    "http://data.fixer.io/api/latest?access_key=d4ccb5b6b46428aa9c4362f9e948d02e&format=1";
   const [inputValue, setInputValue] = useState(1);
   const [moedaDe, setMoedaDe] = useState("BRL");
   const [moedaPara, setMoedaPara] = useState("USD");
@@ -51,8 +54,27 @@ function App() {
     if (event.currentTarget.checkValidity() === true) {
       //alert("CORRETO");
       //TODO implementar a chamada do fixer.io
-      setExibirModal(true);
+      //setExibirModal(true); testando pra ve se o modal esta resentando ps presets
+
+      setExibirSpinner(true);
+      axios.get(BASE_URL).then((response) => {
+        const cotacao = obterCotacao(response.data);
+        setResultadoConversao(
+          `${inputValue} ${moedaDe} = ${cotacao}${moedaPara}`
+        );
+        setExibirModal(true);
+        setExibirSpinner(false);
+      });
     }
+  }
+  function obterCotacao(dadosCotacao) {
+    if (!dadosCotacao || dadosCotacao.success !== true) {
+      return false;
+    }
+    const cotacaoDe = dadosCotacao.rates[moedaDe];
+    const cotacaoPara = dadosCotacao.rates[moedaPara];
+    const cotacao = (1 / (cotacaoDe * cotacaoPara)) * inputValue;
+    return cotacao.toFixed(2);
   }
 
   //noValidate validated={formValidado} VALIDAÇÃO VISUAL
