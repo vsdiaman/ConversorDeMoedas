@@ -143,13 +143,21 @@ function App() {
             </Col>
           </Row>
         </Form>
-        <Modal show={exibirModal} onHide={handleFecharModal}>
+        <Modal
+          show={exibirModal}
+          onHide={handleFecharModal}
+          data-testid="modal"
+        >
           <Modal.Header closeButton>
             <Modal.Title>Conversão</Modal.Title>
           </Modal.Header>
           <Modal.Body>{resultadoConversao}</Modal.Body>
           <Modal.Footer>
-            <Button variant="success" onClick={handleFecharModal}>
+            <Button
+              variant="success"
+              onClick={handleFecharModal}
+              data-testid="btn-conversao"
+            >
               Nova Conversão
             </Button>
           </Modal.Footer>
