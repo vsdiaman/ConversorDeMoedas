@@ -18,7 +18,7 @@ import ListarMoedas from "components/List/listar-moedas";
 
 function App() {
   const BASE_URL =
-    "http://data.fixer.io/api/latest?access_key=d4ccb5b6b46428aa9c4362f9e948d02e&format=1";
+    "http://data.fixer.io/api/latest?access_key=d4ccb5b6b46428aa9c4362f9e948d02e";
   const [inputValue, setInputValue] = useState(1);
   const [moedaDe, setMoedaDe] = useState("BRL");
   const [moedaPara, setMoedaPara] = useState("USD");
@@ -26,6 +26,7 @@ function App() {
   const [formValidado, setFormValidado] = useState(false);
   const [exibirModal, setExibirModal] = useState(false);
   const [resultadoConversao, setResultadoConversao] = useState("");
+  const [error, setError] = useState(false);
   //const [fecharModal, setFecharModal] = useState(true);
 
   function handleValue(event) {
@@ -57,14 +58,22 @@ function App() {
       //setExibirModal(true); testando pra ve se o modal esta resentando ps presets
 
       setExibirSpinner(true);
-      axios.get(BASE_URL).then((response) => {
-        const cotacao = obterCotacao(response.data);
-        setResultadoConversao(
-          `${inputValue} ${moedaDe} = ${cotacao}${moedaPara}`
-        );
-        setExibirModal(true);
-        setExibirSpinner(false);
-      });
+      axios
+        .get(BASE_URL)
+        .then((response) => {
+          const cotacao = obterCotacao(response.data);
+          if (cotacao) {
+            setResultadoConversao(
+              `${inputValue} ${moedaDe} = ${cotacao}${moedaPara}`
+            );
+            setExibirModal(true);
+            setExibirSpinner(false);
+            setError(false);
+          } else {
+            exibirError();
+          }
+        })
+        .catch((err) => exibirError());
     }
   }
   function obterCotacao(dadosCotacao) {
@@ -79,10 +88,15 @@ function App() {
 
   //noValidate validated={formValidado} VALIDAÇÃO VISUAL
 
+  function exibirError() {
+    setError(true);
+    setExibirSpinner(false);
+  }
+
   return (
     <Container>
       <h1>Conversor de moedas</h1>
-      <Alert variant="danger" show={false}>
+      <Alert variant="danger" show={error}>
         Erro obtendo dados de conversão, tente novamente .
       </Alert>
       <Jumbotron>
